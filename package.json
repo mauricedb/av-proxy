@@ -17,5 +17,9 @@
   "bugs": {
     "url": "https://github.com/mauricedb/av-proxy/issues"
   },
-  "homepage": "https://github.com/mauricedb/av-proxy#readme"
+  "homepage": "https://github.com/mauricedb/av-proxy#readme",
+  "dependencies": {
+    "http-proxy": "^1.16.2",
+    "morgan": "^1.7.0"
+  }
 }
