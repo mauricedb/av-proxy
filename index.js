@@ -7,7 +7,8 @@ var proxy = httpProxy.createProxyServer({
     secure: false
   })
   .on('proxyRes', function (proxyRes, req, res) {
-    proxyRes.headers['access-control-allow-origin'] = '*'
+    proxyRes.headers['access-control-allow-origin'] = '*';
+    proxyRes.headers['access-control-max-age'] = 3600;
   });
 
 var listener = http.createServer(
