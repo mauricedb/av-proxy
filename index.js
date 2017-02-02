@@ -13,6 +13,8 @@ var proxy = httpProxy.createProxyServer({
 
 var listener = http.createServer(
   function (req, res) {
+    console.log(JSON.stringify(req.headers));
+    
     logger(req, res, function (err) {
       // if (err) return done(err)
       proxy.web(req, res);
