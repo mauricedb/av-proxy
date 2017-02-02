@@ -8,13 +8,14 @@ var proxy = httpProxy.createProxyServer({
   })
   .on('proxyRes', function (proxyRes, req, res) {
     proxyRes.headers['access-control-allow-origin'] = '*';
+    proxyRes.headers['access-control-allow-headers'] = 'origin, authorization, x-company';
     proxyRes.headers['access-control-max-age'] = 3600;
   });
 
 var listener = http.createServer(
   function (req, res) {
     console.log(JSON.stringify(req.headers));
-    
+
     logger(req, res, function (err) {
       // if (err) return done(err)
       proxy.web(req, res);
