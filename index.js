@@ -1,20 +1,66 @@
 var httpProxy = require('http-proxy');
 var http = require('http');
+var fs = require('fs');
 var morgan = require('morgan');
 var logger = morgan('short');
+
+var fileName = 'D:/home/LogFiles/Application/headers-' + Date.now() + '.log';
+var headers = {acrh:{}, acrm: {}};
+
 var proxy = httpProxy.createProxyServer({
     target: 'https://accountview.net',
     secure: false
   })
+  .on('proxyReq', function (proxyReq, req, res, options) {
+      if (req.method === 'OPTIONS') {
+        proxyReq.setHeader('Access-Control-Request-Headers', 'authorization, x-company');
+      }
+  })
   .on('proxyRes', function (proxyRes, req, res) {
-    proxyRes.headers['access-control-allow-origin'] = '*';
-    proxyRes.headers['access-control-allow-headers'] = 'origin, authorization, x-company';
-    proxyRes.headers['access-control-max-age'] = 3600;
+      
+    //   var log = {
+    //       method: req.method,
+    //       statusCode: proxyRes.statusCode,
+    //       request: req.headers,
+    //       response: proxyRes.headers
+    //   }
+      
+    //   fs.writeFile( 'D:/home/LogFiles/Application/request-' + Date.now() + '.log', JSON.stringify(log, 0, 2), function(err) {
+    //     if(err) {
+    //         throw err;
+    //     }
+    // }); 
+
+      
+    // proxyRes.headers['access-control-allow-origin'] = '*';
+    // proxyRes.headers['access-control-allow-origin'] = req.headers['origin']
+    // proxyRes.headers['access-control-allow-headers'] = 'origin, authorization, x-company';
+    proxyRes.headers['access-control-allow-headers'] = req.headers['access-control-request-headers']
+    // proxyRes.headers['access-control-max-age'] = 3600;
   });
 
 var listener = http.createServer(
   function (req, res) {
-    console.log(JSON.stringify(req.headers));
+    // console.log(JSON.stringify(req.headers));
+    var origin = req.headers['origin'];
+    var acrh = req.headers['access-control-request-headers'];
+    var acrm = req.headers['access-control-request-method'];
+    var ua = req.headers['user-agent'];
+    if (acrh) {
+        headers.acrh[acrh] = '';
+        headers.acrm[acrm] = '';
+        
+        headers[ua] = headers[ua] || {};
+        headers[ua]['origin'] = origin || '';
+        headers[ua]['access-control-request-headers'] = acrh || '';
+        headers[ua]['access-control-request-method'] = acrm || '';
+        
+        fs.writeFile(fileName, JSON.stringify(headers, 0, 2), function(err) {
+            if(err) {
+                throw err;
+            }
+        }); 
+    }
 
     logger(req, res, function (err) {
       // if (err) return done(err)
